@@ -7,6 +7,7 @@
 	<version>2.11</version>
 	<name>MinetopiaFarms</name>
 	<build>
+		<defaultGoal>clean package</defaultGoal>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -18,29 +19,27 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.1.2</version>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.4</version>
 				<executions>
 					<execution>
-						<id>unpack</id>
 						<phase>package</phase>
 						<goals>
-							<goal>unpack</goal>
+							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.github.cryptomorin</groupId>
-									<artifactId>xseries</artifactId>
-									<version>7.6.0</version>
-									<includes>**/*XMaterial*.java</includes>
-								</artifactItem>
-							</artifactItems>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 	</build>
 	<repositories>
 		<repository>
@@ -82,7 +81,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.16.1-R0.1-SNAPSHOT</version>
+			<version>1.16.4-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -127,11 +126,6 @@
 			<groupId>io.github.bananapuncher714</groupId>
 			<artifactId>NBTEditor</artifactId>
 			<version>7.16</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.cryptomorin</groupId>
-			<artifactId>XSeries</artifactId>
-			<version>7.6.0</version>
 		</dependency>
 	</dependencies>
 </project>
