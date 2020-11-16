@@ -24,17 +24,6 @@ public class Utils {
 		return ChatColor.translateAlternateColorCodes('&', input);
 	}
 
-	public static ItemStack createItemStack(Material mat, String name, List<String> lore) {
-		ItemStack is = new ItemStack(mat);
-		ItemMeta ism = is.getItemMeta();
-		if (name != null) {
-			ism.setDisplayName(color(name));
-		}
-		ism.setLore(lore);
-		is.setItemMeta(ism);
-		return is;
-	}
-
 	@SuppressWarnings("deprecation")
 	public static void handleToolDurability(Player p) {
 		if ((short) (p.getInventory().getItemInMainHand().getDurability() + 2) >= p.getInventory().getItemInMainHand()

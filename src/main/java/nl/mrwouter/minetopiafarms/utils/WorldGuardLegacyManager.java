@@ -1,22 +1,17 @@
 package nl.mrwouter.minetopiafarms.utils;
 
-import java.lang.reflect.Method;
-import java.util.*;
-
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.lang.reflect.Method;
 
 public class WorldGuardLegacyManager {
 
@@ -38,27 +33,10 @@ public class WorldGuardLegacyManager {
 		return (WorldGuardPlugin) plugin;
 	}
 
-	public WorldEditPlugin getWorldEdit() {
-		Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-		if (!(plugin instanceof WorldEditPlugin)) {
-			return null;
-		}
-		return (WorldEditPlugin) plugin;
-	}
-
-	public ProtectedRegion getLowerCasePlot(World w, String regionname) {
-		for (ProtectedRegion pr : getRegionManager(w).getRegions().values()) {
-			if (pr.getId().toLowerCase().equalsIgnoreCase(regionname)) {
-				return pr;
-			}
-		}
-		return null;
-	}
-
 	public RegionManager getRegionManager(World w) {
 		if (getWgVer().contains("7.")) {
 			try {
-				Class<?> wgClass = Reflection.getClass("com.sk89q.worldguard.WorldGuard");
+				Class<?> wgClass = Class.forName("com.sk89q.worldguard.WorldGuard");
 
 				Object instance = wgClass.getDeclaredMethod("getInstance").invoke(null);
 				Class<?> wgInstanceClass = instance.getClass();
@@ -81,66 +59,8 @@ public class WorldGuardLegacyManager {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ProtectedRegion> getRegions(Location loc) {
-		ArrayList<ProtectedRegion> regions = new ArrayList<>();
-		if (getWgVer().contains("7.")) {
-			try {
-				// List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
-				RegionManager mngr = getRegionManager(loc.getWorld());
-
-				Class<?> blockVector3 = Reflection.getClass("com.sk89q.worldedit.math.BlockVector3");
-
-				Method applicableRegions = mngr.getClass().getDeclaredMethod("getApplicableRegions", blockVector3);
-
-				Method blockVectorAt = blockVector3.getDeclaredMethod("at", double.class, double.class, double.class);
-				Object blockVector = blockVectorAt.invoke(null, loc.getX(), loc.getY(), loc.getZ());
-
-				Object regionSet = applicableRegions.invoke(mngr, blockVector);
-
-				Method getregions = regionSet.getClass().getMethod("getRegions");
-
-				regions = new ArrayList<>(((HashSet<ProtectedRegion>) getregions.invoke(regionSet)));
-
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-			// return new
-			// ArrayList<ProtectedRegion>(getRegionManager(loc.getWorld()).getApplicableRegions(BlockVector3.at(loc.getX(),
-			// loc.getY(), loc.getZ())).getRegions());
-		} else {
-			regions = new ArrayList<>(getRegionManager(loc.getWorld())
-					.getApplicableRegions(new Vector(loc.getX(), loc.getY(), loc.getZ())).getRegions());
-		}
-
-		regions.sort(Comparator.comparing(ProtectedRegion::getPriority));
-		return regions;
-	}
-
-	public ProtectedCuboidRegion getProtectedCubiodRegion(String regionname, Location loc1, Location loc2) {
-		if (getWgVer().contains("7.")) {
-			try {
-
-				Object bvloc1 = getBlockVectorV3(loc1);
-				Object bvloc2 = getBlockVectorV3(loc2);
-
-				Class<?> prCbRg = Reflection.getClass("com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion");
-
-				return (ProtectedCuboidRegion) prCbRg.getConstructor(String.class, bvloc1.getClass(), bvloc2.getClass())
-						.newInstance(regionname, bvloc1, bvloc2);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		} else {
-			return new ProtectedCuboidRegion(regionname,
-					new com.sk89q.worldedit.BlockVector(loc1.getX(), loc1.getY(), loc1.getZ()),
-					new com.sk89q.worldedit.BlockVector(loc2.getX(), loc2.getY(), loc2.getZ()));
-		}
-		return null;
-	}
-
 	public Object getBlockVectorV3(Location loc) throws Exception {
-		Class<?> blockVector3 = Reflection.getClass("com.sk89q.worldedit.math.BlockVector3");
+		Class<?> blockVector3 = Class.forName("com.sk89q.worldedit.math.BlockVector3");
 
 		Method blockVectorAt = blockVector3.getDeclaredMethod("at", double.class, double.class, double.class);
 		return blockVectorAt.invoke(null, loc.getX(), loc.getY(), loc.getZ());
@@ -149,7 +69,7 @@ public class WorldGuardLegacyManager {
 	public FlagRegistry getFlagRegistry() {
 		if (getWgVer().contains("7.")) {
 			try {
-				Class<?> wgClass = Reflection.getClass("com.sk89q.worldguard.WorldGuard");
+				Class<?> wgClass = Class.forName("com.sk89q.worldguard.WorldGuard");
 
 				Object instance = wgClass.getDeclaredMethod("getInstance").invoke(null);
 				Class<?> wgInstanceClass = instance.getClass();
@@ -169,7 +89,7 @@ public class WorldGuardLegacyManager {
 			try {
 				RegionManager mngr = getRegionManager(loc.getWorld());
 
-				Class<?> blockVector3 = Reflection.getClass("com.sk89q.worldedit.math.BlockVector3");
+				Class<?> blockVector3 = Class.forName("com.sk89q.worldedit.math.BlockVector3");
 
 				Method applicableRegions = mngr.getClass().getDeclaredMethod("getApplicableRegions", blockVector3);
 

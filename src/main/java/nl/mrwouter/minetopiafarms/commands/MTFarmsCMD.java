@@ -1,22 +1,14 @@
 package nl.mrwouter.minetopiafarms.commands;
 
-import java.util.UUID;
-
+import nl.mrwouter.minetopiafarms.Main;
+import nl.mrwouter.minetopiafarms.utils.CitizensLegacyManager;
+import nl.mrwouter.minetopiafarms.utils.Updat3r;
+import nl.mrwouter.minetopiafarms.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.event.DespawnReason;
-import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.util.Colorizer;
-import net.citizensnpcs.npc.skin.SkinnableEntity;
-import nl.mrwouter.minetopiafarms.Main;
-import nl.mrwouter.minetopiafarms.utils.Updat3r;
-import nl.mrwouter.minetopiafarms.utils.Utils;
 
 public class MTFarmsCMD implements CommandExecutor {
 
@@ -54,17 +46,13 @@ public class MTFarmsCMD implements CommandExecutor {
 			}
 			Player player = (Player) sender;
 
-			NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, Main.getMessage("NPC.Name"));
-
-			npc.data().set(NPC.PLAYER_SKIN_UUID_METADATA, Main.getMessage("NPC.Skin.UUID"));
-
-			npc.spawn(player.getLocation());
-
-			((SkinnableEntity) npc.getEntity()).setSkinName(Bukkit.getOfflinePlayer(UUID.fromString(Main.getMessage("NPC.Skin.UUID"))).getName());
-
-			npc.despawn(DespawnReason.PENDING_RESPAWN);
-			npc.setName(Colorizer.parseColors(Main.getMessage("NPC.Name")));
-			npc.spawn(player.getLocation());
+			try {
+				CitizensLegacyManager.getInstance().spawnNPC(Main.getMessage("NPC.Name"),
+						CitizensLegacyManager.getInstance().isNewAPI() ? Main.getMessage("NPC.Skin.Name") : Main.getMessage("NPC.Skin.UUID"),
+						player.getLocation());
+			} catch (Exception e) {
+				sender.sendMessage(Utils.color("&4ERROR: Kon geen NPC spawnen."));
+			}
 
 			sender.sendMessage(Utils.color("&3NPC gespanwed op jouw huidige locatie!"));
 		} else {

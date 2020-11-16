@@ -25,7 +25,7 @@ public class NPCClickListener implements Listener {
 
 			double paymentAmount = 0;
 			for (ItemStack item : clicker.getInventory().getContents()) {
-				if (item != null && item.getType() != null) {
+				if (item != null) {
 					if (item.getType() == Material.BEETROOT) {
 						if (clicker.getInventory().removeItem(item).size() == 0)
 							paymentAmount = paymentAmount
@@ -61,7 +61,7 @@ public class NPCClickListener implements Listener {
 			}
 
 			for (ItemStack item : clicker.getInventory().getContents()) {
-				if (item != null && item.getType() != null) {
+				if (item != null) {
 					if (item.getType() == XMaterial.COAL_ORE.parseMaterial()) {
 						if (clicker.getInventory().removeItem(item).size() == 0)
 							paymentAmount = paymentAmount
@@ -99,7 +99,7 @@ public class NPCClickListener implements Listener {
 			}
 
 			for (ItemStack item : clicker.getInventory().getContents()) {
-				if (item != null && item.getType() != null) {
+				if (item != null) {
 					if (item.getType().toString().contains("LOG")) {
 						if (clicker.getInventory().removeItem(item).size() == 0)
 							paymentAmount = paymentAmount + (item.getAmount()
